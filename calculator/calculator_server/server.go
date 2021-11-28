@@ -92,13 +92,13 @@ func (*server) FindMaximum(stream calculatorpb.CalculatorService_FindMaximumServ
 		number := req.GetNumber()
 		if number > maxNumber {
 			maxNumber = number
-		}
 
-		err = stream.Send(&calculatorpb.FindMaximumResponse{
-			MaxNumber: maxNumber,
-		})
-		if err != nil {
-			log.Fatalf("error while sending data to client: %v", err)
+			err = stream.Send(&calculatorpb.FindMaximumResponse{
+				MaxNumber: maxNumber,
+			})
+			if err != nil {
+				log.Fatalf("error while sending data to client: %v", err)
+			}
 		}
 	}
 }

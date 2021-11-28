@@ -137,7 +137,7 @@ func doFindMaximum(c calculatorpb.CalculatorServiceClient) {
 				break
 			}
 
-			fmt.Printf("Received: %v\n", res.GetMaxNumber())
+			fmt.Printf("Maximum number for now is: %v\n", res.GetMaxNumber())
 		}
 		close(waitc)
 	}()
