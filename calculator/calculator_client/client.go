@@ -8,11 +8,15 @@ import (
 	"time"
 
 	"github.com/mirageruler/grpc-go-course/calculator/calculatorpb"
+
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func main() {
 	fmt.Println("Calculator Client")
+	fmt.Println("--------------------------------------------------------------------")
 
 	dialOption := grpc.WithInsecure()
 	conn, err := grpc.Dial("localhost:50051", dialOption)
@@ -29,7 +33,9 @@ func main() {
 
 	//doComputeAverage(c)
 
-	doFindMaximum(c)
+	// doFindMaximum(c)
+
+	doErrorUnary(c)
 }
 
 func doUnary(c calculatorpb.CalculatorServiceClient) {
@@ -144,4 +150,33 @@ func doFindMaximum(c calculatorpb.CalculatorServiceClient) {
 
 	// block until everything is done
 	<-waitc
+}
+
+func doErrorUnary(c calculatorpb.CalculatorServiceClient) {
+	fmt.Println("Starting to do a SquareRoot Unary RPC...")
+	// correct call
+	doHandleErrorUnaryCall(c, 10)
+
+	// error call
+	doHandleErrorUnaryCall(c, -2)
+}
+
+func doHandleErrorUnaryCall(c calculatorpb.CalculatorServiceClient, number int32) {
+	res, err := c.SquareRoot(context.Background(), &calculatorpb.SquareRootRequest{Number: number})
+	if err != nil {
+		errStatus, ok := status.FromError(err)
+		if ok {
+			// actual error from gRPC (user error)
+			fmt.Println(errStatus.Message())
+			fmt.Println(errStatus.Code())
+			if errStatus.Code() == codes.InvalidArgument {
+				fmt.Println("We probaly sent a negative number!")
+				return
+			}
+		} else {
+			log.Fatalf("Big error calling SquareRoot: %v", err)
+			return
+		}
+	}
+	fmt.Printf("Result of square root of %v is: %v\n", number, res.GetSqrtNumber())
 }

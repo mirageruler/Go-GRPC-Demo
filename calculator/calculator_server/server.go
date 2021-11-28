@@ -6,11 +6,15 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net"
 	"time"
 
-	"github.com/mirageruler/grpc-go-course/calculator/calculatorpb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"github.com/mirageruler/grpc-go-course/calculator/calculatorpb"
 )
 
 type server struct{}
@@ -52,7 +56,7 @@ func (*server) PrimeNumberDecomposition(req *calculatorpb.PrimeNumberDecompositi
 }
 
 func (*server) ComputeAverage(stream calculatorpb.CalculatorService_ComputeAverageServer) error {
-	fmt.Printf("ComputeAverage func was invoked with a streaming request\n")
+	fmt.Printf("Received ComputeAverage RPC\n")
 
 	sum := 0
 	count := 0
@@ -77,7 +81,7 @@ func (*server) ComputeAverage(stream calculatorpb.CalculatorService_ComputeAvera
 }
 
 func (*server) FindMaximum(stream calculatorpb.CalculatorService_FindMaximumServer) error {
-	fmt.Printf("FindMaximum func was invoked with a streaming request\n")
+	fmt.Printf("Received FindMaximum RPC\n")
 
 	var maxNumber int32
 	for {
@@ -103,6 +107,19 @@ func (*server) FindMaximum(stream calculatorpb.CalculatorService_FindMaximumServ
 	}
 }
 
+func (*server) SquareRoot(ctx context.Context, req *calculatorpb.SquareRootRequest) (*calculatorpb.SquareRootResponse, error) {
+	fmt.Printf("Received SquareRoot RPC\n")
+
+	number := req.GetNumber()
+	if number < 0 {
+		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("Received a negative number: %v", number))
+	}
+
+	return &calculatorpb.SquareRootResponse{
+		SqrtNumber: math.Sqrt(float64(number)),
+	}, nil
+}
+
 func main() {
 	fmt.Println("Calculator Server")
 
@@ -113,7 +130,8 @@ func main() {
 
 	addr := lis.Addr()
 	bt1, _ := json.Marshal(addr)
-	fmt.Println("ADDR: ", string(bt1))
+	fmt.Println("SERVER ADDRESS: ", string(bt1))
+	fmt.Println("----------------------------------------------------------------------------------------------------------------------------------------")
 
 	s := grpc.NewServer()
 	calculatorpb.RegisterCalculatorServiceServer(s, &server{})
