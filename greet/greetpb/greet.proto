@@ -1,8 +1,13 @@
 syntax = "proto3";
 
 package greet;
+
+// Go import path
+// Explain: `greet` is the parent dir and `greetpb` is the current dir of this .proto file 
+// --> Generates a `*.pb.go` (* is the name of .proto file) file within a Go package named `greetpb` located in `greet/greetpb`
 option go_package="greet/greetpb";
 
+// To gen code: protoc --proto_path=./greet/greetpb --go_out=. ./greet/greetpb/greet.proto
 message Greeting {
     string first_name = 1;
     string last_name = 2;
