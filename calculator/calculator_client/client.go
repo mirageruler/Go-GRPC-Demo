@@ -11,6 +11,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 )
 
@@ -18,7 +19,7 @@ func main() {
 	fmt.Println("Calculator Client")
 	fmt.Println("--------------------------------------------------------------------")
 
-	dialOption := grpc.WithInsecure()
+	dialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 	conn, err := grpc.Dial("localhost:50051", dialOption)
 	if err != nil {
 		log.Fatalf("could not connect: %v", err)
@@ -31,9 +32,9 @@ func main() {
 
 	//doPrimeNumberDecomposition(c)
 
-	//doComputeAverage(c)
+	// doComputeAverage(c)
 
-	// doFindMaximum(c)
+	//doFindMaximum(c)
 
 	doErrorUnary(c)
 }

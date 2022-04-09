@@ -244,6 +244,7 @@ func main() {
 		}
 	}()
 
+	// If the Database is not exist then it will be created at first, the same is true for the Collection.
 	collection = client.Database("mydb").Collection("blog")
 
 	lis, err := net.Listen("tcp", "0.0.0.0:50051")
@@ -255,7 +256,7 @@ func main() {
 	s := grpc.NewServer(opts...)
 	blogpb.RegisterBlogServiceServer(s, &server{})
 
-	// Register reflection servie on gRPC server.
+	// Register reflection service on gRPC server.
 	reflection.Register(s)
 
 	go func() {
@@ -270,10 +271,9 @@ func main() {
 	signal.Notify(ch, os.Interrupt)
 
 	// Block until a signal is received
-
 	<-ch
 	fmt.Println("Stopping the server...")
-	s.Stop()
+	s.GracefulStop()
 	fmt.Println("Closing the listener...")
 	lis.Close()
 	fmt.Println("Closing MongoDB Connection...")

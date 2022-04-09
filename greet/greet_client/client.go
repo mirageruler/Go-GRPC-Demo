@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 )
 
@@ -20,7 +21,7 @@ func main() {
 	fmt.Println("----------------------------------------------------------------------------------------------------------------------------------------")
 
 	tls := true // TLS flag.
-	opts := grpc.WithInsecure()
+	opts := grpc.WithTransportCredentials(insecure.NewCredentials())
 	if tls {
 		certFile := "ssl/ca.crt" // Certificate Authority Trust certificate
 		creds, sslErr := credentials.NewClientTLSFromFile(certFile, "")
@@ -40,13 +41,13 @@ func main() {
 
 	c := greetpb.NewGreetServiceClient(conn)
 
-	doUnary(c)
+	//doUnary(c)
 
 	// doServerStreaming(c)
-	// doClientStreaming(c)
+	//doClientStreaming(c)
 	// doBiDiStreaming(c)
-	// doUnaryWithDeadline(c, 5*time.Second) // should complete
-	// doUnaryWithDeadline(c, 1*time.Second) // should timeout
+	doUnaryWithDeadline(c, 5*time.Second) // should complete
+	doUnaryWithDeadline(c, 1*time.Second) // should timeout
 }
 
 func doUnary(c greetpb.GreetServiceClient) {
@@ -97,27 +98,27 @@ func doClientStreaming(c greetpb.GreetServiceClient) {
 	fmt.Println("Starting to do a Client Streaming RPC...")
 
 	requests := []*greetpb.LongGreetRequest{
-		&greetpb.LongGreetRequest{
+		{
 			Greeting: &greetpb.Greeting{
 				FirstName: "Khoi",
 			},
 		},
-		&greetpb.LongGreetRequest{
+		{
 			Greeting: &greetpb.Greeting{
 				FirstName: "John",
 			},
 		},
-		&greetpb.LongGreetRequest{
+		{
 			Greeting: &greetpb.Greeting{
 				FirstName: "Lucy",
 			},
 		},
-		&greetpb.LongGreetRequest{
+		{
 			Greeting: &greetpb.Greeting{
 				FirstName: "Mark",
 			},
 		},
-		&greetpb.LongGreetRequest{
+		{
 			Greeting: &greetpb.Greeting{
 				FirstName: "Piper",
 			},
@@ -155,27 +156,27 @@ func doBiDiStreaming(c greetpb.GreetServiceClient) {
 	}
 
 	requests := []*greetpb.GreetEveryoneRequest{
-		&greetpb.GreetEveryoneRequest{
+		{
 			Greeting: &greetpb.Greeting{
 				FirstName: "Khoi",
 			},
 		},
-		&greetpb.GreetEveryoneRequest{
+		{
 			Greeting: &greetpb.Greeting{
 				FirstName: "John",
 			},
 		},
-		&greetpb.GreetEveryoneRequest{
+		{
 			Greeting: &greetpb.Greeting{
 				FirstName: "Lucy",
 			},
 		},
-		&greetpb.GreetEveryoneRequest{
+		{
 			Greeting: &greetpb.Greeting{
 				FirstName: "Mark",
 			},
 		},
-		&greetpb.GreetEveryoneRequest{
+		{
 			Greeting: &greetpb.Greeting{
 				FirstName: "Piper",
 			},
